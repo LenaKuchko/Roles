@@ -54,9 +54,9 @@ namespace BasicAuthentication.Controllers
                 return View();
             }
         }
-        public ActionResult Edit(string roleId)
+        public ActionResult Edit(string RoleName)
         {
-            var thisRole = _db.Roles.FirstOrDefault(r => r.Id == roleId);
+            var thisRole = _db.Roles.FirstOrDefault(r => r.Name == RoleName);
 
             return View(thisRole);
         }
@@ -74,15 +74,15 @@ namespace BasicAuthentication.Controllers
 
         //
         // POST: /Roles/Edit/5
-        [HttpPost]
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(IdentityRole role)
+        public ActionResult EditRole(IdentityRole role)
         {
             try
             {
                 var thisRole = _db.Roles.FirstOrDefault(r => r.Id == role.Id);
                 thisRole.Name = role.Name;
-                _db.Entry(role).State = EntityState.Modified;
+                //_db.Entry(thisRole).State = EntityState.Modified;// useless thing
                 _db.SaveChanges();
 
                 return RedirectToAction("Index");
