@@ -43,7 +43,8 @@ namespace BasicAuthentication.Controllers
             {
                 _db.Roles.Add(new IdentityRole()
                 {
-                    Name = RoleName
+                    Name = RoleName,
+                    NormalizedName = RoleName.ToUpper()
                 });
                 _db.SaveChanges();
                 ViewBag.ResultMessage = "Role created successfully !";
@@ -95,31 +96,32 @@ namespace BasicAuthentication.Controllers
         public IActionResult ManageUserRoles()
         {
             // prepopulat roles for the view dropdown
-            var list = _db.Roles.OrderBy(r => r.Name).ToList().Select(rr => new SelectListItem { Value = rr.Id.ToString(), Text = rr.Name }).ToList();
+            var list = _db.Roles.OrderBy(r => r.Name).ToList().Select(rr => new SelectListItem { Value = rr.Name.ToString(), Text = rr.Name }).ToList();
             ViewBag.Roles = list;
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RoleAddToUser(string UserName, string RoleId)
+        public async Task<IActionResult> RoleAddToUser(string UserName, string Roles)
         {
-            try
-            {
+         
                 ApplicationUser user = _db.Users.FirstOrDefault(u => u.UserName == UserName);
-                var task = await _userManager.AddToRoleAsync(user, RoleId);
-
-            }
-            catch (Exception ex)
-            {
-                return View();
-            }
+                await _userManager.AddToRoleAsync(user, Roles);
+            
             ViewBag.ResultMessage = "Role created successfully !";
 
             // prepopulat roles for the view dropdown
-            var list = _db.Roles.OrderBy(r => r.Name).ToList().Select(rr => new SelectListItem { Value = rr.Id.ToString(), Text = rr.Name }).ToList();
+            var list = _db.Roles.OrderBy(r => r.Name).ToList().Select(rr => new SelectListItem { Value = rr.Name.ToString(), Text = rr.Name }).ToList();
             ViewBag.Roles = list;
 
+            return View("ManageUserRoles");
+        }
+
+        public async Task<IActionResult> GetRoles(string UserName)
+        {
+            ApplicationUser user = _db.Users.FirstOrDefault(u => u.UserName == UserName);
+            //var list = _db.
             return View("ManageUserRoles");
         }
     }
