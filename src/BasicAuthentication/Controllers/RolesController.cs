@@ -120,9 +120,15 @@ namespace BasicAuthentication.Controllers
 
         public async Task<IActionResult> GetRoles(string UserName)
         {
-            ApplicationUser user = _db.Users.FirstOrDefault(u => u.UserName == UserName);
-            //var list = _db.
-            return View("ManageUserRoles");
+            ApplicationUser user =  _db.Users.FirstOrDefault(u => u.UserName == UserName);
+
+            ViewBag.RolesForUser = await _userManager.GetRolesAsync(user);
+
+            var list = _db.Roles.OrderBy(r => r.Name).ToList()
+                .Select(rr => new SelectListItem { Value = rr.Name.ToString(), Text = rr.Name }).ToList();
+
+            ViewBag.Roles = list;
+            return View();
         }
     }
 }
